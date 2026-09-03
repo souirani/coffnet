@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coffnet · Cronograma Editável · Setembro 2026</title>
+<link href="https://fonts.cdnfonts.com/css/century-gothic" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Century Gothic','CenturyGothic','AppleGothic',sans-serif !important}
+body{background:#fafafa;color:#1a1a1a;min-height:100vh}
+
+.header{background:linear-gradient(135deg,#0a0a0a 0%,#1a1a1a 100%);color:#fff;padding:40px 50px 50px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-50%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(255,214,0,0.08) 0%,transparent 70%);pointer-events:none}
+.header-tag{font-size:11px;color:#FFD600;letter-spacing:5px;font-weight:700;margin-bottom:16px}
+.header-title{font-size:42px;font-weight:700;color:#FFD600;line-height:1;margin-bottom:8px;letter-spacing:-1px}
+.header-sub{font-style:italic;font-size:14px;color:#bbb;margin-bottom:24px}
+.header-pills{display:flex;flex-wrap:wrap;gap:10px}
+.header-pill{border:1px solid rgba(255,214,0,0.4);padding:7px 14px;border-radius:20px;font-size:11px;letter-spacing:1.5px;color:#FFD600;font-weight:600;background:rgba(255,214,0,0.05)}
+
+.alert{background:#fffae6;border-left:4px solid #FFD600;padding:12px 50px;font-size:12px;color:#555}
+.alert strong{color:#1a1a1a}
+
+.toolbar{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid #eee;padding:12px 50px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tb-btn{background:#1a1a1a;color:#FFD600;border:none;padding:9px 16px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.tb-btn:hover{background:#FFD600;color:#1a1a1a}
+.tb-btn.secondary{background:#fff;color:#888;border:1px solid #ddd}
+.tb-btn.secondary:hover{border-color:#FFD600;color:#1a1a1a;background:#fff}
+.tb-info{font-size:11px;color:#aaa;margin-left:auto}
+
+.main{padding:30px 50px 80px;max-width:1000px;margin:0 auto}
+
+.week-header{display:flex;align-items:center;gap:12px;margin:36px 0 20px}
+.week-header:first-child{margin-top:0}
+.week-badge{background:#FFD600;color:#1a1a1a;font-size:11px;font-weight:700;letter-spacing:2px;padding:6px 14px;border-radius:20px}
+.week-dates{font-size:13px;color:#888;font-style:italic}
+
+.day-card{background:#fff;border:1px solid #eee;border-radius:12px;margin-bottom:18px;overflow:hidden;transition:box-shadow .2s}
+.day-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.05)}
+.day-card-head{display:flex;align-items:center;gap:16px;padding:18px 22px;background:#fafafa;border-bottom:1px solid #f0f0f0}
+.day-date-badge{background:#1a1a1a;color:#FFD600;font-size:15px;font-weight:700;padding:6px 12px;border-radius:6px;min-width:52px;text-align:center}
+.day-week-name{font-size:11px;color:#888;letter-spacing:2px;font-weight:700}
+.day-special{font-size:10px;color:#c9a600;font-weight:700;letter-spacing:1px;margin-top:2px}
+
+.status-select{margin-left:auto;position:relative}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid;cursor:pointer;user-select:none}
+.s-naoprod{color:#ef4444;border-color:#ef444440;background:#ef444410}
+.s-editar{color:#f59e0b;border-color:#f59e0b40;background:#f59e0b10}
+.s-pronto{color:#22a06b;border-color:#22a06b40;background:#22a06b10}
+.s-aprovado{color:#c9a600;border-color:#c9a60040;background:#fffae6}
+.s-agendado{color:#6c63ff;border-color:#6c63ff40;background:#6c63ff10}
+.s-postado{color:#22a06b;border-color:#22a06b40;background:#22a06b10}
+.status-menu{position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid #eee;border-radius:8px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;display:none;min-width:150px}
+.status-menu.open{display:block}
+.status-menu .status-badge{display:flex;width:100%;margin:2px 0}
+
+.day-card-body{padding:22px}
+.type-pill{display:inline-block;background:#1a1a1a;color:#FFD600;font-size:10px;padding:4px 10px;border-radius:4px;letter-spacing:1px;font-weight:700;margin-bottom:14px}
+.pilar-pill{display:inline-block;background:#f0f0f0;color:#555;font-size:10px;padding:4px 10px;border-radius:4px;letter-spacing:1px;font-weight:700;margin-bottom:14px;margin-left:6px}
+
+.field-group{margin-bottom:16px}
+.field-label{font-size:9px;letter-spacing:2px;color:#aaa;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.edit-hint{font-size:9px;color:#ccc;font-weight:400;letter-spacing:0}
+[contenteditable="true"]{outline:none;transition:background .15s}
+[contenteditable="true"]:hover{background:#fffae6}
+[contenteditable="true"]:focus{background:#fffce0;box-shadow:0 0 0 2px #FFD60060;border-radius:4px}
+.editable-title{font-size:19px;font-weight:700;color:#1a1a1a;padding:4px 6px;margin-left:-6px;border-radius:4px}
+.editable-arte{background:#fffae6;border-left:3px solid #FFD600;padding:12px 14px;font-size:13px;color:#1a1a1a;font-style:italic;border-radius:0 6px 6px 0;line-height:1.6}
+.editable-legenda{font-size:13px;color:#333;line-height:1.7;padding:6px;margin-left:-6px;border-radius:4px}
+.editable-img-desc{font-size:12.5px;color:#555;line-height:1.6;padding:8px 10px;background:#fafafa;border:1px dashed #ddd;border-radius:6px}
+
+.tela-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed #eee;align-items:flex-start}
+.tela-item:last-child{border-bottom:none}
+.tela-num-tag{background:#1a1a1a;color:#FFD600;font-size:9px;font-weight:700;padding:3px 7px;border-radius:4px;white-space:nowrap;margin-top:2px}
+.tela-text{font-size:12px;color:#333;line-height:1.6;flex:1;padding:2px 6px;border-radius:4px}
+.add-tela-btn{font-size:11px;color:#888;background:none;border:1px dashed #ddd;padding:6px 12px;border-radius:6px;cursor:pointer;margin-top:8px}
+.add-tela-btn:hover{border-color:#FFD600;color:#1a1a1a}
+.remove-tela{font-size:14px;color:#ddd;cursor:pointer;padding:0 4px;flex-shrink:0}
+.remove-tela:hover{color:#ef4444}
+
+.media-zone{border:2px dashed #e0e0e0;border-radius:10px;padding:16px;margin-top:6px}
+.media-zone.has-images{border-style:solid;border-color:#eee}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:10px}
+.media-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid #eee}
+.media-thumb img{width:100%;height:100%;object-fit:cover}
+.media-thumb .remove-media{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border:none}
+.media-upload-btn{font-size:11px;color:#888;background:#fafafa;border:1px dashed #ddd;padding:10px;border-radius:8px;cursor:pointer;text-align:center;width:100%}
+.media-upload-btn:hover{border-color:#FFD600;color:#1a1a1a}
+.file-input{display:none}
+
+.links-list{margin-top:6px}
+.link-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.link-input{flex:1;font-size:12px;padding:7px 10px;border:1px solid #eee;border-radius:6px;color:#333}
+.link-input:focus{outline:none;border-color:#FFD600}
+.remove-link{font-size:14px;color:#ddd;cursor:pointer;padding:0 6px}
+.remove-link:hover{color:#ef4444}
+.add-link-btn{font-size:11px;color:#888;background:none;border:1px dashed #ddd;padding:6px 12px;border-radius:6px;cursor:pointer;margin-top:4px}
+.add-link-btn:hover{border-color:#FFD600;color:#1a1a1a}
+
+.add-day-btn{width:100%;background:#fff;border:2px dashed #ddd;color:#aaa;padding:16px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:18px;letter-spacing:1px}
+.add-day-btn:hover{border-color:#FFD600;color:#1a1a1a}
+
+.save-indicator{position:fixed;bottom:24px;right:24px;background:#22a06b;color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none;z-index:100}
+.save-indicator.show{opacity:1;transform:translateY(0)}
+
+.summary-bar{display:flex;gap:20px;padding:16px 22px;background:#fff;border:1px solid #eee;border-radius:12px;margin-bottom:24px;flex-wrap:wrap}
+.summary-stat{text-align:center}
+.summary-num{font-size:22px;font-weight:700;color:#FFD600}
+.summary-lbl{font-size:9px;color:#888;letter-spacing:1.5px;font-weight:700}
+
+@media(max-width:700px){
+  .header{padding:28px 22px 34px}
+  .header-title{font-size:30px}
+  .alert{padding:10px 22px}
+  .toolbar{padding:10px 22px}
+  .main{padding:20px 16px 60px}
+  .day-card-head{flex-wrap:wrap}
+  .status-select{margin-left:0;width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-tag">CRONOGRAMA EDITÁVEL · FEED COFFNET</div>
+  <div class="header-title">setembro completo</div>
+  <div class="header-sub">clique em qualquer texto pra editar · adicione fotos e links de inspiração</div>
+  <div class="header-pills">
+    <div class="header-pill">@COFFNETSMC</div>
+    <div class="header-pill">03/09 → 30/09/2026</div>
+    <div class="header-pill">SOU IRANÍ</div>
+  </div>
+</div>
+
+<div class="alert">
+  ✏️ <strong>Tudo aqui é editável.</strong> Clique em qualquer texto pra escrever por cima. Suas alterações salvam sozinhas neste navegador. Use o botão "Exportar backup" de vez em quando pra guardar uma cópia de segurança.
+</div>
+
+<div class="toolbar">
+  <button class="tb-btn" onclick="addDay()">+ ADICIONAR DIA</button>
+  <button class="tb-btn secondary" onclick="exportBackup()">↓ EXPORTAR BACKUP</button>
+  <button class="tb-btn secondary" onclick="resetAll()">↻ RESETAR TUDO</button>
+  <span class="tb-info" id="lastSaved">Pronto pra editar</span>
+</div>
+
+<div class="main" id="mainContent">
+
+  <div class="summary-bar" id="summaryBar">
+    <div class="summary-stat"><div class="summary-num" id="statTotal">18</div><div class="summary-lbl">POSTS</div></div>
+    <div class="summary-stat"><div class="summary-num" id="statCards">14</div><div class="summary-lbl">CARDS</div></div>
+    <div class="summary-stat"><div class="summary-num" id="statCarrosseis">4</div><div class="summary-lbl">CARROSSÉIS</div></div>
+    <div class="summary-stat"><div class="summary-num" id="statPronto">0</div><div class="summary-lbl">PRONTOS</div></div>
+  </div>
+
+  <div class="week-header"><span class="week-badge">SEMANA 1</span><span class="week-dates">03/09 a 06/09</span></div>
+  <div id="week1"></div>
+
+  <div class="week-header"><span class="week-badge">SEMANA 2</span><span class="week-dates">07/09 a 13/09</span></div>
+  <div id="week2"></div>
+
+  <div class="week-header"><span class="week-badge">SEMANA 3</span><span class="week-dates">14/09 a 20/09</span></div>
+  <div id="week3"></div>
+
+  <div class="week-header"><span class="week-badge">SEMANA 4</span><span class="week-dates">21/09 a 27/09</span></div>
+  <div id="week4"></div>
+
+  <div class="week-header"><span class="week-badge">SEMANA 5</span><span class="week-dates">28/09 a 30/09</span></div>
+  <div id="week5"></div>
+
+  <button class="add-day-btn" onclick="addDay()">+ ADICIONAR NOVO DIA / POST</button>
+
+</div>
+
+<div class="save-indicator" id="saveIndicator">✓ Salvo</div>
+
+<script>
+const STORAGE_KEY = 'coffnet-cronograma-setembro-2026';
+
+const initialData = {
+  week1: [
+    {id:'d1', date:'03', week:'QUINTA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Por que às vezes um site demora mais que outro',
+     imgDesc:'Ilustração de duas telas de navegador lado a lado, uma carregando rápido e outra mais devagar, com pequenos ícones de servidor ao fundo. Cores preto e amarelo.',
+     arte:'"Por que alguns sites abrem na hora e outros demoram mais, mesmo com a mesma internet?"',
+     legenda:'Boa pergunta! 🌐 Isso acontece porque cada site tem seu próprio servidor, e alguns são mais rápidos que outros pra responder. Sites com muitas imagens ou vídeos também costumam demorar um pouquinho mais pra carregar tudo. Sua internet pode estar ótima mesmo assim! Ficou curioso sobre isso? Comenta aqui que a gente te explica com calma! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d2', date:'04', week:'SEXTA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Chuva atrapalha a internet?',
+     imgDesc:'Ilustração simples de uma nuvem de chuva ao lado de um ícone de Wi-Fi, em tons de amarelo e preto. Visual limpo, tipografia grande para a pergunta central.',
+     arte:'"Chuva atrapalha a internet?"',
+     legenda:'Depende do tipo de conexão! ☁️ Internet via rádio pode sofrer um pouco de interferência em temporais mais fortes, mas a internet via fibra óptica, que é a que a Coffnet usa, é bem mais resistente a esse tipo de instabilidade. 📶 Ficou com mais alguma dúvida assim? Pode comentar aqui que a gente adora explicar!',
+     telas:[], images:[], links:[]},
+    {id:'d3', date:'05', week:'SÁBADO', special:'', type:'CARROSSEL', pilar:'ENGAJAMENTO', status:'s-naoprod',
+     title:'Coisas que só quem tem internet boa entende',
+     imgDesc:'Fundo preto com tipografia amarela em destaque, cada tela com um ícone simples relacionado à situação descrita (tela de filme, ícone de família em chamada, barra de download). Visual leve e divertido.',
+     arte:'',
+     legenda:'Internet boa muda o dia a dia mais do que a gente imagina. 😊 São detalhes pequenos que fazem toda a diferença na correria de todo dia. Comenta aqui qual dessas situações você já vive na sua casa! 📶💛',
+     telas:[
+       'Capa: Coisas que só quem tem internet boa em casa entende. Se identificou, comenta aqui!',
+       'Assistir o filme inteiro sem aparecer nem uma vez a bolinha de carregamento.',
+       'Fazer chamada de vídeo com a família inteira ao mesmo tempo e ninguém travar.',
+       'Baixar um arquivo grande e nem perceber o tempo passar.',
+       'Comenta aqui: qual dessas já é rotina pra você?'
+     ], images:[], links:[]}
+  ],
+  week2: [
+    {id:'d4', date:'07', week:'SEGUNDA-FEIRA', special:'DIA DA INDEPENDÊNCIA', type:'CARD', pilar:'SOMOS DAQUI', status:'s-naoprod',
+     title:'Independência e conexão',
+     imgDesc:'Elementos discretos da bandeira do Brasil (verde e amarelo) combinando com a identidade da Coffnet. Tipografia elegante, sem exageros patrióticos, mantendo o preto e amarelo como base.',
+     arte:'"Independência é sobre liberdade. A nossa também é sobre te dar liberdade pra usar sua internet do jeito que você quiser."',
+     legenda:'Hoje celebramos a independência do nosso país! 🇧🇷 E aqui na Coffnet, a gente acredita que liberdade também é ter uma internet que funciona do seu jeito, no seu tempo, sem depender de mais ninguém. Feliz Dia da Independência pra você e pra toda a sua família! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d5', date:'09', week:'QUARTA-FEIRA', special:'DIA DA VELOCIDADE', type:'CARD', pilar:'CONEXÃO QUE FUNCIONA', status:'s-naoprod',
+     title:'Dia da Velocidade',
+     imgDesc:'Elemento visual de movimento, tipo linhas de velocidade ou um raio estilizado em amarelo sobre fundo preto, transmitindo sensação de rapidez.',
+     arte:'"Hoje é Dia da Velocidade. E isso aqui a gente leva a sério todos os dias."',
+     legenda:'Hoje o assunto é rapidez! ⚡ Rapidez pra você assistir, trabalhar, jogar e se conectar sem esperar nada. Esse é o compromisso da Coffnet com você todos os dias do ano, não só hoje. Feliz Dia da Velocidade! 📶💛',
+     telas:[], images:[], links:[]},
+    {id:'d6', date:'11', week:'SEXTA-FEIRA', special:'', type:'CARD', pilar:'ENGAJAMENTO', status:'s-naoprod',
+     title:'O mudo que ninguém desmuta a tempo',
+     imgDesc:'Ilustração simples de um ícone de microfone cortado (mudo), com uma pessoa falando ao fundo em estilo minimalista, cores preto e amarelo.',
+     arte:'"Aquele momento em que todo mundo desmutou menos você, e você só descobre depois de falar por dois minutos inteiros."',
+     legenda:'Se você já passou por isso numa reunião online, sabe exatamente a vergonha que é. 😅 A boa notícia é que isso não tem nada a ver com sua internet, é só aquele detalhe que todo mundo esquece de vez em quando! Marca aqui quem também já viveu esse perrengue!',
+     telas:[], images:[], links:[]},
+    {id:'d7', date:'12', week:'SÁBADO', special:'', type:'CARROSSEL', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Dicas rápidas pro seu Wi-Fi render mais',
+     imgDesc:'Visual educativo e limpo, com ícones simples (roteador, ondas de sinal, relógio) e numeração destacada em amarelo para cada dica, fundo branco ou preto alternado para facilitar leitura.',
+     arte:'',
+     legenda:'Separamos algumas dicas simples que fazem grande diferença no seu dia a dia. 📶 São pequenos ajustes que você mesmo consegue fazer em casa, sem complicação nenhuma. Salva esse post pra consultar sempre que precisar, tá bom? 💛',
+     telas:[
+       'Capa: 4 dicas rápidas pra sua internet render melhor em casa.',
+       'Deixe o roteador em um local aberto e elevado, longe de paredes grossas.',
+       'Evite deixar ele perto de micro-ondas ou televisão, esses aparelhos atrapalham o sinal.',
+       'Reinicie o roteador uma vez por semana pra manter tudo funcionando bem.',
+       'Se mesmo assim o sinal continuar fraco, fala com a gente que a gente te ajuda a entender.'
+     ], images:[], links:[]}
+  ],
+  week3: [
+    {id:'d8', date:'14', week:'SEGUNDA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'100 mega ou 300 mega, qual a diferença?',
+     imgDesc:'Comparação visual simples entre dois blocos lado a lado (100 Mbps x 300 Mbps), com ícones de quantidade de aparelhos conectados em cada um, cores contrastantes em preto e amarelo.',
+     arte:'"O que muda entre internet de 100 mega e 300 mega, na prática?"',
+     legenda:'Ótima pergunta! Na prática, quanto maior a velocidade, mais aparelhos a sua casa aguenta usando ao mesmo tempo sem perder qualidade. 📶 Se você mora sozinho, 100 mega já resolve bem o dia a dia. Se a casa tem mais gente e mais aparelhos ligados, 300 mega faz muita diferença. Ficou com dúvida sobre qual o ideal pra você? Chama a gente que a gente te ajuda! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d9', date:'15', week:'TERÇA-FEIRA', special:'DIA DO CLIENTE', type:'CARD', pilar:'SUPORTE QUE RESOLVE', status:'s-naoprod',
+     title:'Dia do Cliente',
+     imgDesc:'Visual acolhedor, tipografia elegante centralizada, elemento gráfico de coração ou aperto de mão estilizado em amarelo sobre fundo preto.',
+     arte:'"Hoje o dia é seu. Obrigado por confiar na Coffnet todos os dias."',
+     legenda:'Hoje o dia é todo seu! 💛 Cada cliente que confia na Coffnet é motivo de muito orgulho pra nossa equipe. Obrigado por fazer parte dessa caminhada com a gente e por escolher a Coffnet todos os dias, em cada cantinho da sua casa. Feliz Dia do Cliente! 😊',
+     telas:[], images:[], links:[]},
+    {id:'d10', date:'16', week:'QUARTA-FEIRA', special:'', type:'CARD', pilar:'CONEXÃO QUE FUNCIONA', status:'s-naoprod',
+     title:'Todo mundo ao mesmo tempo',
+     imgDesc:'Ilustração de uma casa com ícones saindo de diferentes cômodos representando TV, celular, notebook e videogame conectados ao mesmo tempo, tudo em estilo simples e colorido dentro da paleta da marca.',
+     arte:'"Todo mundo conectado ao mesmo tempo. E ninguém reclamando."',
+     legenda:'Pai assistindo o jogo, mãe na videochamada, filho jogando online e ainda tem alguém vendo série ao mesmo tempo. 📶 A Coffnet aguenta a casa toda funcionando junto, sem briga pelo sinal e sem ninguém perdendo a paciência. É assim que a gente gosta de ver! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d11', date:'18', week:'SEXTA-FEIRA', special:'', type:'CARD', pilar:'ENGAJAMENTO', status:'s-naoprod',
+     title:'O aviso que ninguém quer ver',
+     imgDesc:'Tela de celular estilizada mostrando a mensagem de erro de conexão, com expressão de susto ilustrada de forma simples e bem-humorada ao lado.',
+     arte:'"Sem conexão com a internet." A frase mais assustadora que existe.',
+     legenda:'Se essa frase já te deu um mini susto no meio de um filme, saiba que você não está sozinho! 😅 A gente sabe exatamente esse friozinho na barriga. Marca aqui quem também sente esse desespero na hora, pra gente ver que não é só você!',
+     telas:[], images:[], links:[]},
+    {id:'d12', date:'19', week:'SÁBADO', special:'', type:'CARROSSEL', pilar:'ENGAJAMENTO', status:'s-naoprod',
+     title:'Qual usuário de internet você é?',
+     imgDesc:'Cada tela representando um perfil de usuário com um ícone característico (pipoca para maratonista, notebook para trabalho remoto, casa cheia para família conectada), fundo preto com tipografia amarela.',
+     arte:'',
+     legenda:'A gente adora saber com quem está falando! 😊 Diz aí nos comentários, qual desses perfis é a sua cara no dia a dia? Fica à vontade pra contar mais detalhes também, a gente ama interagir com vocês! 📶💛',
+     telas:[
+       'Capa: Qual tipo de usuário de internet você é? Desliza e descobre.',
+       'O Maratonista: Sua semana é planejada em volta da próxima temporada. Internet que trava no meio do episódio é o maior perrengue.',
+       'O Trabalhador remoto: Sua manhã começa com três abas abertas e o medo da câmera travar na hora da fala.',
+       'A Família Conectada: Casa cheia de aparelho ligado ao mesmo tempo, e ninguém pode brigar pelo sinal.',
+       'Comenta aqui qual desses é você!'
+     ], images:[], links:[]}
+  ],
+  week4: [
+    {id:'d13', date:'21', week:'SEGUNDA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Streaming em 4K pede internet forte',
+     imgDesc:'Ilustração de uma tela de TV exibindo o selo "4K" com ondas de sinal saindo dela em direção a um ícone de roteador, cores preto e amarelo.',
+     arte:'"Assistir em 4K pede mais internet do que assistir em qualidade normal?"',
+     legenda:'Pede sim! 📺 Quanto maior a qualidade da imagem, mais dados são necessários pra transmitir tudo sem travar. Por isso, quem gosta de assistir filmes e séries em 4K precisa de uma internet mais rápida e estável pra aproveitar sem interrupção. Ficou com dúvida se o seu plano é suficiente? Chama a gente que a gente te ajuda a entender! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d14', date:'23', week:'QUARTA-FEIRA', special:'', type:'CARD', pilar:'CONEXÃO QUE FUNCIONA', status:'s-naoprod',
+     title:'O silêncio que incomoda',
+     imgDesc:'Tela de vídeo congelada estilizada, com o ícone de carregamento centralizado, fundo escuro remetendo a uma sala de cinema em casa.',
+     arte:'"Aquele silêncio estranho quando o carregamento trava bem na cena principal."',
+     legenda:'Todo mundo já viveu esse momento de tensão total, né? 😬 Com a Coffnet esse silêncio incômodo não acontece, porque a conexão foi feita pra aguentar até os momentos mais importantes do seu filme ou da sua série. Fala com a gente e sente a diferença na prática! 📶💛',
+     telas:[], images:[], links:[]},
+    {id:'d15', date:'25', week:'SEXTA-FEIRA', special:'', type:'CARD', pilar:'ENGAJAMENTO', status:'s-naoprod',
+     title:'Esperando o WhatsApp Web carregar',
+     imgDesc:'Ilustração de um celular e um computador lado a lado conectados por uma linha pontilhada, com um relógio ou ampulheta simbolizando a espera, cores da marca.',
+     arte:'"Trocou de celular e agora tá aquela espera eterna pro WhatsApp Web sincronizar tudo de novo."',
+     legenda:'Esses minutinhos parecem uma eternidade, né? 😅 A boa notícia é que com uma internet rápida essa espera fica bem mais curta e você volta pras suas conversas rapidinho. Marca aqui quem já passou por essa agonia recentemente!',
+     telas:[], images:[], links:[]},
+    {id:'d16', date:'26', week:'SÁBADO', special:'', type:'CARROSSEL', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Mitos e verdades sobre internet',
+     imgDesc:'Cada tela com selo visual de "Verdade" (check verde ou amarelo) ou "Mito" (X vermelho ou cinza), tipografia grande e clara, fundo preto ou branco alternado.',
+     arte:'',
+     legenda:'Preparamos um quizinho divertido pra testar seus conhecimentos sobre internet! 😊 Acertou quantas perguntas? Comenta aqui embaixo e desafia os amigos também, vamos ver quem manda melhor! 📶💛',
+     telas:[
+       'Capa: Verdade ou mito? Testa seus conhecimentos sobre internet.',
+       '"Quanto mais aparelhos conectados, mais lenta fica a internet."',
+       'VERDADE. Cada aparelho divide a velocidade total do plano contratado.',
+       '"Reiniciar o roteador ajuda a resolver problemas de conexão."',
+       'VERDADE. Isso limpa a memória do aparelho e ajuda a manter a estabilidade.',
+       '"A posição do roteador não faz diferença nenhuma."',
+       'MITO. A posição influencia bastante. Local aberto e elevado sempre funciona melhor.'
+     ], images:[], links:[]}
+  ],
+  week5: [
+    {id:'d17', date:'28', week:'SEGUNDA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Apps abertos consumindo sua internet sem você saber',
+     imgDesc:'Ilustração de um celular com vários ícones de aplicativos flutuando ao redor, alguns com uma pequena seta indicando consumo de dados em segundo plano, estilo clean.',
+     arte:'"Sabia que apps abertos em segundo plano continuam consumindo internet mesmo sem você usar?"',
+     legenda:'Pois é, isso acontece mais do que a gente imagina! 📱 Aplicativos de atualização automática, backup de fotos e redes sociais costumam continuar rodando por trás, mesmo fechados na tela. Fechar esses aplicativos de vez em quando ajuda a manter sua internet mais livre pro que você realmente precisa usar. Ficou com dúvida sobre isso? Comenta aqui que a gente explica com calma! 💛',
+     telas:[], images:[], links:[]},
+    {id:'d18', date:'29', week:'TERÇA-FEIRA', special:'', type:'CARD', pilar:'EDUCACIONAL', status:'s-naoprod',
+     title:'Sinal cheio não é sinônimo de internet rápida',
+     imgDesc:'Ícone de barras de sinal Wi-Fi totalmente cheias ao lado de um ícone de velocímetro baixo, para ilustrar visualmente o contraste entre os dois conceitos.',
+     arte:'"Ver o sinal do Wi-Fi cheio no celular significa que a internet está rápida?"',
+     legenda:'Não necessariamente! 📶 O sinal cheio mostra que o aparelho está bem conectado ao roteador, mas a velocidade real depende do seu plano contratado e de quantos aparelhos estão usando a internet ao mesmo tempo. Ficou curioso sobre esse assunto? Comenta aqui que a gente adora explicar mais! 😊',
+     telas:[], images:[], links:[]},
+    {id:'d19', date:'30', week:'QUARTA-FEIRA', special:'', type:'CARD', pilar:'CONEXÃO QUE FUNCIONA', status:'s-naoprod',
+     title:'Internet que acompanha sua rotina',
+     imgDesc:'Colagem simples de ícones representando trabalho, estudo, streaming e jogos ao redor de um símbolo central de Wi-Fi, transmitindo variedade de uso.',
+     arte:'"Trabalho, estudo, série, jogo e ainda uma call de última hora. Sua internet dá conta de tudo isso?"',
+     legenda:'A rotina de hoje em dia pede muito de uma boa conexão, né? 📶 Trabalho, estudo, entretenimento e ainda aquela chamada inesperada, tudo isso precisa de uma internet que realmente aguente o tranco. Se a resposta for não, talvez seja hora de conhecer a Coffnet. Fala com a gente e descobre o plano ideal pra sua rotina! 💛',
+     telas:[], images:[], links:[]}
+  ]
+};
+
+let data = null;
+
+function loadData(){
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    data = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(initialData));
+  } catch(e){
+    data = JSON.parse(JSON.stringify(initialData));
+  }
+}
+
+function persist(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showSaved();
+    updateSummary();
+  } catch(e){
+    console.log('Erro ao salvar:', e);
+    alert('Não consegui salvar. Provavelmente as imagens estão ocupando muito espaço no navegador. Tente usar imagens menores ou remova algumas.');
+  }
+}
+
+let saveTimeout;
+function showSaved(){
+  const el = document.getElementById('saveIndicator');
+  el.classList.add('show');
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => el.classList.remove('show'), 1500);
+  document.getElementById('lastSaved').textContent = 'Salvo às ' + new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+
+const statusOptions = [
+  {cls:'s-naoprod', label:'⚠ Não produzido'},
+  {cls:'s-editar', label:'✎ Falta editar'},
+  {cls:'s-pronto', label:'✓ Pronto'},
+  {cls:'s-aprovado', label:'★ Aprovado'},
+  {cls:'s-agendado', label:'◷ Agendado'},
+  {cls:'s-postado', label:'✓ Postado'}
+];
+
+function statusLabel(cls){
+  const found = statusOptions.find(s => s.cls === cls);
+  return found ? found.label : '⚠ Não produzido';
+}
+
+const weekIds = ['week1','week2','week3','week4','week5'];
+
+function render(){
+  weekIds.forEach(w => renderWeek(w, data[w] || []));
+  updateSummary();
+}
+
+function renderWeek(containerId, days){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  days.forEach(day => container.appendChild(renderDayCard(day)));
+}
+
+function renderDayCard(day){
+  const card = document.createElement('div');
+  card.className = 'day-card';
+  card.dataset.id = day.id;
+
+  const telasHtml = day.type === 'CARROSSEL' ? renderTelas(day) : '';
+  const imagesHtml = renderImages(day);
+  const linksHtml = renderLinks(day);
+
+  card.innerHTML = `
+    <div class="day-card-head">
+      <div class="day-date-badge" contenteditable="true" data-field="date">${day.date}</div>
+      <div>
+        <div class="day-week-name" contenteditable="true" data-field="week">${day.week}</div>
+        ${day.special ? `<div class="day-special" contenteditable="true" data-field="special">${day.special}</div>` : `<div class="day-special" contenteditable="true" data-field="special" style="opacity:.3">+ data especial</div>`}
+      </div>
+      <div class="status-select">
+        <span class="status-badge ${day.status}" onclick="toggleStatusMenu(event, '${day.id}')">${statusLabel(day.status)}</span>
+        <div class="status-menu" id="menu-${day.id}">
+          ${statusOptions.map(s => `<span class="status-badge ${s.cls}" onclick="setStatus('${day.id}','${s.cls}')">${s.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="day-card-body">
+      <span class="type-pill" contenteditable="true" data-field="type">${day.type}</span>
+      <span class="pilar-pill" contenteditable="true" data-field="pilar">${day.pilar}</span>
+
+      <div class="field-group">
+        <div class="field-label">TÍTULO</div>
+        <div class="editable-title" contenteditable="true" data-field="title">${day.title}</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">DESCRIÇÃO DA IMAGEM</div>
+        <div class="editable-img-desc" contenteditable="true" data-field="imgDesc">${day.imgDesc || 'Clique pra descrever a imagem/arte deste post'}</div>
+      </div>
+
+      ${day.type !== 'CARROSSEL' ? `
+      <div class="field-group">
+        <div class="field-label">TEXTO DA ARTE</div>
+        <div class="editable-arte" contenteditable="true" data-field="arte">${day.arte}</div>
+      </div>` : `
+      <div class="field-group">
+        <div class="field-label">TELAS DO CARROSSEL <span class="edit-hint">(clique pra editar cada uma)</span></div>
+        <div class="telas-container">${telasHtml}</div>
+        <button class="add-tela-btn" onclick="addTela('${day.id}')">+ ADICIONAR TELA</button>
+      </div>`}
+
+      <div class="field-group">
+        <div class="field-label">LEGENDA</div>
+        <div class="editable-legenda" contenteditable="true" data-field="legenda">${day.legenda}</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">FOTOS / ARTES DE REFERÊNCIA</div>
+        <div class="media-zone ${day.images.length ? 'has-images' : ''}">
+          <div class="media-grid">${imagesHtml}</div>
+          <label class="media-upload-btn">
+            📎 Clique pra adicionar imagem
+            <input type="file" class="file-input" accept="image/*" multiple onchange="handleImageUpload(event, '${day.id}')">
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">LINKS DE INSPIRAÇÃO</div>
+        <div class="links-list">${linksHtml}</div>
+        <button class="add-link-btn" onclick="addLink('${day.id}')">+ ADICIONAR LINK</button>
+      </div>
+
+      <button class="add-tela-btn" style="border-color:#ffd6d6;color:#c66" onclick="removeDay('${day.id}')">🗑 REMOVER ESTE POST</button>
+    </div>
+  `;
+
+  card.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    el.addEventListener('blur', () => {
+      const field = el.dataset.field;
+      if(field) updateDayField(day.id, field, el.textContent.trim());
+    });
+  });
+
+  return card;
+}
+
+function renderTelas(day){
+  return day.telas.map((tela, idx) => `
+    <div class="tela-item">
+      <span class="tela-num-tag">TELA ${idx + 1}</span>
+      <div class="tela-text" contenteditable="true" onblur="updateTela('${day.id}', ${idx}, this.textContent)">${tela}</div>
+      <span class="remove-tela" onclick="removeTela('${day.id}', ${idx})">✕</span>
+    </div>
+  `).join('');
+}
+
+function renderImages(day){
+  return day.images.map((img, idx) => `
+    <div class="media-thumb">
+      <img src="${img}">
+      <button class="remove-media" onclick="removeImage('${day.id}', ${idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function renderLinks(day){
+  return day.links.map((link, idx) => `
+    <div class="link-row">
+      <input class="link-input" value="${link}" placeholder="https://..." onblur="updateLink('${day.id}', ${idx}, this.value)">
+      <span class="remove-link" onclick="removeLink('${day.id}', ${idx})">✕</span>
+    </div>
+  `).join('');
+}
+
+function findDay(id){
+  for(const w of weekIds){
+    const found = (data[w]||[]).find(d => d.id === id);
+    if(found) return found;
+  }
+  return null;
+}
+
+function updateDayField(id, field, value){
+  const day = findDay(id);
+  if(day){ day[field] = value; persist(); }
+}
+
+function toggleStatusMenu(e, id){
+  e.stopPropagation();
+  document.querySelectorAll('.status-menu.open').forEach(m => { if(m.id !== 'menu-'+id) m.classList.remove('open'); });
+  document.getElementById('menu-'+id).classList.toggle('open');
+}
+document.addEventListener('click', () => document.querySelectorAll('.status-menu.open').forEach(m => m.classList.remove('open')));
+
+function setStatus(id, status){
+  const day = findDay(id);
+  if(day){ day.status = status; persist(); render(); }
+}
+
+function addTela(id){
+  const day = findDay(id);
+  if(day){ day.telas.push('Nova tela, clique pra editar'); persist(); render(); }
+}
+function updateTela(id, idx, value){
+  const day = findDay(id);
+  if(day){ day.telas[idx] = value; persist(); }
+}
+function removeTela(id, idx){
+  const day = findDay(id);
+  if(day){ day.telas.splice(idx,1); persist(); render(); }
+}
+
+function addLink(id){
+  const day = findDay(id);
+  if(day){ day.links.push(''); persist(); render(); }
+}
+function updateLink(id, idx, value){
+  const day = findDay(id);
+  if(day){ day.links[idx] = value; persist(); }
+}
+function removeLink(id, idx){
+  const day = findDay(id);
+  if(day){ day.links.splice(idx,1); persist(); render(); }
+}
+
+function handleImageUpload(event, id){
+  const files = event.target.files;
+  const day = findDay(id);
+  if(!day || !files.length) return;
+  let remaining = files.length;
+  [...files].forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      day.images.push(e.target.result);
+      remaining--;
+      if(remaining === 0){ persist(); render(); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function removeImage(id, idx){
+  const day = findDay(id);
+  if(day){ day.images.splice(idx,1); persist(); render(); }
+}
+
+function removeDay(id){
+  if(!confirm('Remover este post do cronograma?')) return;
+  weekIds.forEach(w => { data[w] = (data[w]||[]).filter(d => d.id !== id); });
+  persist(); render();
+}
+
+function addDay(){
+  const newId = 'd' + Date.now();
+  const newDay = {
+    id: newId, date: '--', week: 'NOVO DIA', special: '',
+    type: 'CARD', pilar: 'PILAR', status: 's-naoprod',
+    title: 'Clique pra editar o título',
+    imgDesc: 'Clique pra descrever a imagem',
+    arte: 'Clique pra editar o texto da arte',
+    legenda: 'Clique pra editar a legenda',
+    telas: [], images: [], links: []
+  };
+  data.week5.push(newDay);
+  persist(); render();
+  setTimeout(() => {
+    const el = document.querySelector(`[data-id="${newId}"]`);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+}
+
+function updateSummary(){
+  const all = weekIds.flatMap(w => data[w] || []);
+  document.getElementById('statTotal').textContent = all.length;
+  document.getElementById('statCards').textContent = all.filter(d => d.type === 'CARD').length;
+  document.getElementById('statCarrosseis').textContent = all.filter(d => d.type === 'CARROSSEL').length;
+  document.getElementById('statPronto').textContent = all.filter(d => d.status === 's-pronto' || d.status === 's-postado').length;
+}
+
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'backup-cronograma-coffnet-setembro-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll(){
+  if(confirm('Isso vai apagar TODAS as suas edições e voltar ao cronograma original. Tem certeza?')){
+    localStorage.removeItem(STORAGE_KEY);
+    data = JSON.parse(JSON.stringify(initialData));
+    persist(); render();
+  }
+}
+
+loadData();
+render();
+</script>
+
+</body>
+</html>
